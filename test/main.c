@@ -9,11 +9,11 @@ U32 cmp16(const U16 src[], const U16 dst[]) {
   return src[j] == '\0' && dst[j] == '\0';
 }
 
-#define BUFLEN 10
+#define BUFLEN 100
 const U32 CONST_BUFLEN = BUFLEN;
 
 I32 main(void) {
-  U16 buf[BUFLEN];
+  U8  buf[BUFLEN];
   I32 number;
   F32 fnumber;
 
@@ -30,6 +30,10 @@ I32 main(void) {
   assert(jparse_float("1e10", 5, &fnumber) == 4 && fnumber - 10000000000 < 0.1, "jparse_float(\"1e10\") failed");
   assert(jparse_float("-1e10", 6, &fnumber) == 5 && fnumber + 10000000000 < 0.1, "jparse_float(\"-1e10\") failed");
   assert(jparse_float("1.23e-4", 8, &fnumber) == 7 && fnumber - 0.000123 < 0.1, "jparse_float(\"1.23e-4\") failed");
+
+  assert(jparse_string("\"hello\"", 8, buf, CONST_BUFLEN) == 7 && cmp8len("hello", buf, 5), "jparse_string(\"hello\") failed");
+  assert(jparse_string("\"\"", 3, buf, CONST_BUFLEN) == 2 && cmp8len("", buf, 0), "jparse_string(\"\") failed");
+  assert(jparse_string("\"\\\"\\/\\b\\f\\n\\r\\t\"", 17, buf, CONST_BUFLEN) == 16 && cmp8len("\"/\b\f\n\r\t", buf, 7), "jparse_string(\"\\\"\\/\\b\\f\\n\\r\\t\") failed");
 
   return 0;
 }

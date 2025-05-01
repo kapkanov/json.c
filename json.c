@@ -30,12 +30,12 @@ void strhex2char(const U8 str[], U8 dst[]) {
 }
 
 
-U32 jparse_string(const U8 src[], U8 dst[], const U32 dstlen) {
+U32 jparse_string(const U8 src[], const U32 srclen, U8 dst[], const U32 dstlen) {
   U32 j, k;
 
   assert(src[0] == '"', "jparse_string: string should start from a '\"' character. But it start with %.20s", src);
 
-  for (j = 0, k = 0; j < U32_MAX && k < U32_MAX && src[j] && src[j] != '"'; j++, k++) {
+  for (j = 1, k = 0; j < srclen && src[j] && src[j] != '"'; j++, k++) {
     assert(k < dstlen, "String \"%.20s...\" is too big", src);
     if (src[j] != '\\') {
       dst[k] = src[j];
@@ -67,7 +67,7 @@ U32 jparse_string(const U8 src[], U8 dst[], const U32 dstlen) {
       dst[k] = '\t';
       break;
     case 'u':
-      assert(k + 1 < dstlen, "jparse_string: String is too long");
+      assert(k + 1 < dstlen, "jparse_string: String %.20s is too long", src);
       strhex2char(src + j + 2, dst + k);
       j += 4;
       k++;
@@ -78,7 +78,9 @@ U32 jparse_string(const U8 src[], U8 dst[], const U32 dstlen) {
     j++;
   }
 
-  return j;
+  assert(src[j] == '"', "jparse_string: String should end on the double quote \" character");
+
+  return j + 1;
 }
 
 
