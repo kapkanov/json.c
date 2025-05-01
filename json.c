@@ -23,10 +23,10 @@ void strhex2char(const U8 str[], U8 dst[]) {
     table[j] = j - 'a' + 10;
 
   for (j = 0; j < 4; j++)
-    assert('0' <= str[j] && str[j] <= '9' || 'A' <= str[j] && str[j] <= 'F' || 'a' <= str[j] && str[j] <= 'f', "strhex2char: '%c' is not valid hex digit", str[j]);
+    assert('0' <= str[j] && str[j] <= '9' || 'A' <= str[j] && str[j] <= 'F' || 'a' <= str[j] && str[j] <= 'f', "strhex2char: character '%c' in string '%.20s' is not valid hex digit", str[j], str);
 
-  dst[0] = 0 | str[0] << 4 | str[1];
-  dst[1] = 0 | str[2] << 4 | str[3];
+  dst[0] = 0 | table[str[0]] << 4 | table[str[1]];
+  dst[1] = 0 | table[str[2]] << 4 | table[str[3]];
 }
 
 
@@ -77,6 +77,8 @@ U32 jparse_string(const U8 src[], U8 dst[], const U32 dstlen) {
     }
     j++;
   }
+
+  return j;
 }
 
 
@@ -122,3 +124,35 @@ U32 jparse_boolean(const U8 src[], const U32 srclen, I32 *res) {
   assert(0, "jparse_boolean: %.4s is not a valid boolean", src);
 }
 
+
+U32 jparse_float(const U8 src[], const U32 srclen, F32 *res) {
+  U32 j;
+  F32 sign, fraction, divider;
+
+  j    = 0;
+  sign = 1.0;
+
+  if (src[j] == '-') {
+    sign = -1.0;
+    j    =  1;
+  }
+
+  for (*res = 0; '0' <= src[j] && src[j] <= '9'; j++) {
+    *res = *res * 10.0 + (F32)(src[j] - '0');
+  }
+
+  if (src[j] == '.') {
+    fraction     = 0.0;
+    divider = 1.0;
+    j++;
+    for (; '0' <= src[j] && src[j] <= '9'; j++) {
+      fraction = fraction * 10.0 + (F32)(src[j] - '0');
+      divider *= 10.0;
+    }
+    *res += fraction / divider;
+  }
+  
+  *res *= sign;
+
+  return j;
+}
