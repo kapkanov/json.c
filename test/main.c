@@ -25,8 +25,11 @@ I32 main(void) {
   assert(jparse_boolean("true",  5, &number) == 4 && number == 1, "jparse_boolean(\"true\") failed");
   assert(jparse_boolean("false", 6, &number) == 5 && number == 0, "jparse_boolean(\"false\") failed");
 
-  assert(jparse_float("3.14", 5, &fnumber) == 4 && fnumber - 3.14 < 0.1, "fnumber = %f", fnumber);
-  assert(jparse_float("-3.14", 6, &fnumber) == 5 && fnumber + 3.14 < 0.1, "fnumber = %f", fnumber);
+  assert(jparse_float("3.14", 5, &fnumber) == 4 && fnumber - 3.14 < 0.1, "jparse_float(\"3.14\") failed");
+  assert(jparse_float("-3.14", 6, &fnumber) == 5 && fnumber + 3.14 < 0.1, "jparse_float(\"-3.14\") failed");
+  assert(jparse_float("1e10", 5, &fnumber) == 4 && fnumber - 10000000000 < 0.1, "jparse_float(\"1e10\") failed");
+  assert(jparse_float("-1e10", 6, &fnumber) == 5 && fnumber + 10000000000 < 0.1, "jparse_float(\"-1e10\") failed");
+  assert(jparse_float("1.23e-4", 8, &fnumber) == 7 && fnumber - 0.000123 < 0.1, "jparse_float(\"1.23e-4\") failed");
 
   return 0;
 }

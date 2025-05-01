@@ -128,6 +128,7 @@ U32 jparse_boolean(const U8 src[], const U32 srclen, I32 *res) {
 U32 jparse_float(const U8 src[], const U32 srclen, F32 *res) {
   U32 j;
   F32 sign, fraction, divider;
+  U32 expsign, exp;
 
   j    = 0;
   sign = 1.0;
@@ -152,6 +153,28 @@ U32 jparse_float(const U8 src[], const U32 srclen, F32 *res) {
     *res += fraction / divider;
   }
   
+  if (src[j] == 'e') {
+    expsign  = 1;
+    exp      = 0;
+
+    if (j + 1 < srclen && src[j + 1] == '-') {
+      expsign = 0;
+      j++;
+    }
+
+    for (j++; j < srclen && '0' <= src[j] && src[j] <= '9'; j++) {
+      exp = exp * 10 + src[j] - '0';
+    }
+
+    if (expsign) {
+      for (; exp > 0; exp--)
+        *res *= 10.0;
+    } else {
+      for (; exp > 0; exp--)
+        *res /= 10.0;
+    }
+  }
+
   *res *= sign;
 
   return j;
