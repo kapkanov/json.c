@@ -1,6 +1,7 @@
 #include "../json.c"
 #include <stdio.h>
 
+
 U32 cmp16(const U16 src[], const U16 dst[]) {
   U32 j;
 
@@ -9,8 +10,19 @@ U32 cmp16(const U16 src[], const U16 dst[]) {
   return src[j] == '\0' && dst[j] == '\0';
 }
 
+
+U32 cmp16len(const U16 src[], const U16 dst[], const U32 len) {
+  U32 j;
+
+  for (j = 0; j < len && src[j] == dst[j]; j++);
+
+  return j == len;
+}
+
+
 U32 cmp816len(const U8 src[], const U16 dst[], const U32 len) {
   U32 j;
+  U16 tmp;
 
   for (j = 0; j < len && src[j] == dst[j]; j++);
 
@@ -25,6 +37,7 @@ I32 main(void) {
   U16 buf16[BUFLEN];
   I32 number;
   F32 fnumber;
+  U16 cmpbuf[BUFLEN];
 
   assert(jparse_int("42", &number)  ==  2 && number == 42, "jparse_int(\"42\") failed");
   assert(jparse_int("-42", &number) == 3 && number == -42, "jparse_int(\"-42\") failed");
@@ -43,7 +56,10 @@ I32 main(void) {
   assert(jparse_string("\"hello\"", 8, buf16, CONST_BUFLEN) == 7 && cmp816len("hello", buf16, 5), "jparse_string(\"hello\") failed");
   assert(jparse_string("\"\"", 3, buf16, CONST_BUFLEN) == 2 && cmp816len("", buf16, 0), "jparse_string(\"\") failed");
   assert(jparse_string("\"\\\"\\/\\b\\f\\n\\r\\t\"", 17, buf16, CONST_BUFLEN) == 16 && cmp816len("\"/\b\f\n\r\t", buf16, 7), "jparse_string(\"\\\"\\/\\b\\f\\n\\r\\t\") failed");
-  assert(jparse_string("\"\\u0041\\u005a\"", 15, buf16, CONST_BUFLEN) == 14 && cmp816len("\x0041\x005a", buf16, 2), "jparse_string(\"\\u0041\\u005a\") failed");
+  cmpbuf[0] = '\x41'; cmpbuf[1] = '\x5a';
+  assert(jparse_string("\"\\u0041\\u005a\"", 15, buf16, CONST_BUFLEN) == 14 && cmp16len(cmpbuf, buf16, 2), "jparse_string(\"\\u0041\\u005a\") failed");
+  cmpbuf[0] = 0xd83d; cmpbuf[1] = 0xde00;
+  assert(jparse_string("\"\\ud83d\\ude00\"", 15, buf16, CONST_BUFLEN) == 14 && cmp16len(cmpbuf, buf16, 2), "jparse_string(\"\\ud83d\\ude00\") failed");
 
   return 0;
 }
