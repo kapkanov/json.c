@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 
-U32 cmp16(const U16 src[], const U16 dst[]) {
+I32 cmp16(const U16 src[], const U16 dst[]) {
   U32 j;
 
   for (j = 0; src[j] && dst[j] && src[j] == dst[j]; j++);
@@ -11,7 +11,7 @@ U32 cmp16(const U16 src[], const U16 dst[]) {
 }
 
 
-U32 cmp16len(const U16 src[], const U16 dst[], const U32 len) {
+I32 cmp16len(const U16 src[], const U16 dst[], const U32 len) {
   U32 j;
 
   for (j = 0; j < len && src[j] == dst[j]; j++);
@@ -20,12 +20,19 @@ U32 cmp16len(const U16 src[], const U16 dst[], const U32 len) {
 }
 
 
-U32 cmp816len(const U8 src[], const U16 dst[], const U32 len) {
+I32 cmp816len(const U8 src[], const U16 dst[], const U32 len) {
   U32 j;
   U16 tmp;
 
   for (j = 0; j < len && src[j] == dst[j]; j++);
 
+  return j == len;
+}
+
+
+I32 cmpi32len(const I32 src[], const I32 dst[], const U32 len) {
+  U32 j;
+  for (j = 0; j < len && src[j] == dst[j]; j++);
   return j == len;
 }
 
@@ -38,6 +45,8 @@ I32 main(void) {
   I32 number;
   F32 fnumber;
   U16 cmpbuf[BUFLEN];
+  I32 ibuf32[BUFLEN];
+  I32 icmpbuf32[BUFLEN];
 
   assert(jparse_int("42", &number)  ==  2 && number == 42, "jparse_int(\"42\") failed");
   assert(jparse_int("-42", &number) == 3 && number == -42, "jparse_int(\"-42\") failed");
@@ -62,6 +71,9 @@ I32 main(void) {
   assert(jparse_string("\"\\ud83d\\ude00\"", 15, buf16, CONST_BUFLEN) == 14 && cmp16len(cmpbuf, buf16, 3), "jparse_string(\"\\ud83d\\ude00\") failed");
 
   assert(jparse_null("null", 5, &number) == 4 && number == 0, "jparse_null(\"null\") failed");
+
+  icmpbuf32[0] = 1; icmpbuf32[1] = 2; icmpbuf32[2] = 3;
+  assert(jparse_arrint("[1,2,3]", 8, ibuf32, CONST_BUFLEN) == 7 && cmpi32len(ibuf32, icmpbuf32, 3), "jparse_int(\"[1,2,3]\") failed");
 
   return 0;
 }

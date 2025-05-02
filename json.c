@@ -205,8 +205,6 @@ U32 jparse_float(const U8 src[], const U32 srclen, F32 *res) {
 U32 jparse_null(const U8 src[], const U32 srclen, I32 *res) {
   U32 j;
 
-  *res = 1;
-
   for (j = 0; j < srclen && is_whitespace(src[j]); j++);
 
   assert(srclen > 4 + j, "jparse_null: not enough characters for null value");
@@ -216,4 +214,28 @@ U32 jparse_null(const U8 src[], const U32 srclen, I32 *res) {
   *res = 0;
 
   return j + 4;
+}
+
+
+U32 jparse_arrint(const U8 src[], const U32 srclen, I32 dst[], const U32 dstlen) {
+  U32 j, k;
+
+  for (j = 0; j < srclen && is_whitespace(src[j]); j++);
+
+  assert(src[j] == '[', "jparse_arrint: Array should start from '[' character");
+
+  for (k = 0; j < srclen && src[j] != ']'; j++) {
+    if (is_whitespace(src[j]))
+      continue;
+    if (src[j] == ',') {
+      assert(k < dstlen, "jparse_arrint: Input %.20s is too big", src + j);
+      j++;
+      k++;
+    }
+    jparse_int(src + j, dst + k);
+  }
+
+  assert(src[j] == ']', "jparse_int: Input should end on ']' character, but it ends on %c in string %.20s", src[j], src + j);
+
+  return j + 1;
 }
