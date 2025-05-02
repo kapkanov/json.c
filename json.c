@@ -94,6 +94,8 @@ U32 jparse_string(const U8 src[], const U32 srclen, U16 dst[], const U32 dstlen)
     }
     j++;
   }
+  assert(k < dstlen, "There are not enough space in buffer");
+  dst[k] = 0;
 
   assert(src[j] == '"', "jparse_string: String should end on the double quote \" character");
 

@@ -56,10 +56,10 @@ I32 main(void) {
   assert(jparse_string("\"hello\"", 8, buf16, CONST_BUFLEN) == 7 && cmp816len("hello", buf16, 5), "jparse_string(\"hello\") failed");
   assert(jparse_string("\"\"", 3, buf16, CONST_BUFLEN) == 2 && cmp816len("", buf16, 0), "jparse_string(\"\") failed");
   assert(jparse_string("\"\\\"\\/\\b\\f\\n\\r\\t\"", 17, buf16, CONST_BUFLEN) == 16 && cmp816len("\"/\b\f\n\r\t", buf16, 7), "jparse_string(\"\\\"\\/\\b\\f\\n\\r\\t\") failed");
-  cmpbuf[0] = '\x41'; cmpbuf[1] = '\x5a';
-  assert(jparse_string("\"\\u0041\\u005a\"", 15, buf16, CONST_BUFLEN) == 14 && cmp16len(cmpbuf, buf16, 2), "jparse_string(\"\\u0041\\u005a\") failed");
-  cmpbuf[0] = 0xd83d; cmpbuf[1] = 0xde00;
-  assert(jparse_string("\"\\ud83d\\ude00\"", 15, buf16, CONST_BUFLEN) == 14 && cmp16len(cmpbuf, buf16, 2), "jparse_string(\"\\ud83d\\ude00\") failed");
+  cmpbuf[0] = 0x41; cmpbuf[1] = 0x5a; cmpbuf[2] = 0;
+  assert(jparse_string("\"\\u0041\\u005a\"", 15, buf16, CONST_BUFLEN) == 14 && cmp16len(cmpbuf, buf16, 3), "jparse_string(\"\\u0041\\u005a\") failed");
+  cmpbuf[0] = 0xd83d; cmpbuf[1] = 0xde00; cmpbuf[2] = 0;
+  assert(jparse_string("\"\\ud83d\\ude00\"", 15, buf16, CONST_BUFLEN) == 14 && cmp16len(cmpbuf, buf16, 3), "jparse_string(\"\\ud83d\\ude00\") failed");
 
   return 0;
 }
