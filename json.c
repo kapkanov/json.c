@@ -30,7 +30,25 @@ void strhex2char(const U8 str[], U8 dst[]) {
 }
 
 
-U32 jparse_string(const U8 src[], const U32 srclen, U8 dst[], const U32 dstlen) {
+void strhex2short(const U8 str[], U16 dst[]) {
+  U32 j;
+  U8  table[103];
+
+  for (j = '0'; j <= '9'; j++)
+    table[j] = j - '0';
+  for (j = 'A'; j <= 'F'; j++)
+    table[j] = j - 'A' + 10;
+  for (j = 'a'; j <= 'f'; j++)
+    table[j] = j - 'a' + 10;
+
+  for (j = 0; j < 4; j++)
+    assert('0' <= str[j] && str[j] <= '9' || 'A' <= str[j] && str[j] <= 'F' || 'a' <= str[j] && str[j] <= 'f', "strhex2char: character '%c' in string '%.20s' is not valid hex digit", str[j], str);
+
+  dst[0] = 0 | table[str[0]] << 12 | table[str[1]] << 8 | table[str[2]] << 4 | table[str[3]];
+}
+
+
+U32 jparse_string(const U8 src[], const U32 srclen, U16 dst[], const U32 dstlen) {
   U32 j, k;
 
   assert(src[0] == '"', "jparse_string: string should start from a '\"' character. But it start with %.20s", src);
@@ -68,9 +86,8 @@ U32 jparse_string(const U8 src[], const U32 srclen, U8 dst[], const U32 dstlen) 
       break;
     case 'u':
       assert(k + 1 < dstlen, "jparse_string: String %.20s is too long", src);
-      strhex2char(src + j + 2, dst + k);
+      strhex2short(src + j + 2, dst + k);
       j += 4;
-      k++;
       break;
     default:
       j--;
