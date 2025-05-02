@@ -103,7 +103,7 @@ U32 jparse_string(const U8 src[], const U32 srclen, U16 dst[], const U32 dstlen)
 }
 
 
-U32 is_whitespace(const U8 c) {
+I32 is_whitespace(const U8 c) {
   return c == ' ' || c == '\t' || c == '\n';
 }
 
@@ -199,4 +199,21 @@ U32 jparse_float(const U8 src[], const U32 srclen, F32 *res) {
   *res *= sign;
 
   return j;
+}
+
+
+U32 jparse_null(const U8 src[], const U32 srclen, I32 *res) {
+  U32 j;
+
+  *res = 1;
+
+  for (j = 0; j < srclen && is_whitespace(src[j]); j++);
+
+  assert(srclen > 4 + j, "jparse_null: not enough characters for null value");
+
+  assert(src[j] == 'n' && src[j+1] == 'u' && src[j+2] == 'l' && src[j+3] == 'l', "jparse_null: expected null, but got %.20s", src + j);
+
+  *res = 0;
+
+  return j + 4;
 }

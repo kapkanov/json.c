@@ -61,5 +61,7 @@ I32 main(void) {
   cmpbuf[0] = 0xd83d; cmpbuf[1] = 0xde00; cmpbuf[2] = 0;
   assert(jparse_string("\"\\ud83d\\ude00\"", 15, buf16, CONST_BUFLEN) == 14 && cmp16len(cmpbuf, buf16, 3), "jparse_string(\"\\ud83d\\ude00\") failed");
 
+  assert(jparse_null("null", 5, &number) == 4 && number == 0, "jparse_null(\"null\") failed");
+
   return 0;
 }
